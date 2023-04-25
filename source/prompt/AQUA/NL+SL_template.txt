@@ -1,0 +1,2 @@
+# Question: [QUESTION]
+# Write Python Code to solve the following questions. Store your result as a variable named 'answer'.

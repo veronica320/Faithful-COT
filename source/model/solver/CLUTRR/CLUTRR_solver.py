@@ -1,0 +1,43 @@
+import pickle
+
+def solve(completion):
+    ''' Execute the completion to solve the question (for CLUTRR).
+    :param completion (str): the model completion
+
+    :return (str): the final relation
+    '''
+
+    # get the relation from every step
+    relations = []
+    for line in completion.split('\n')[1:]:
+        if ' = ' in line and not '@' in line: # it's a code line, not a comment line
+            try:
+                relation = line.split(' = ')[1] # get the relation
+            except IndexError as e:
+                print(f"Error: {e}, line: {line}")
+                continue
+            relations.append(relation)
+
+    # load the transitive rules
+    with open("source/model/solver/CLUTRR/trans_rules.pkl", 'rb') as f:
+        trans_dict = pickle.load(f)
+      
+     # apply the transitive rules to get the final relation
+    final_relation = ""
+    for relation in reversed(relations):
+        if not final_relation:
+            final_relation = relation
+        else:
+            # transitive rules
+            try:
+                final_relation = trans_dict[(final_relation, relation)]
+            except KeyError:
+                return "unknown"
+    return final_relation
+
+if __name__ == "__main__":
+    # run a simple test
+    import os
+    os.chdir("../../../..")
+    blob = '''[James]? (independent, support: \"[James] and [Dorothy] werent able to have children naturally, so they adopted [Aida] from sweden.\")\nrelation(Aida, James) = adopted\n# 2. How is [James] related to [Dorothy]? (independent, support: \"[James] and [Dorothy] werent able to have children naturally, so they adopted [Aida] from sweden.\")\nrelation(James, Dorothy) = husband\n# 3. '''
+    print(solve(blob))
