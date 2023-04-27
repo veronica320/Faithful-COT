@@ -44,7 +44,7 @@ if __name__ == "__main__":
 	# predict
 	output_dir = f"output_dir/{dataset_name}/{split}/{model_name}"
 	completion_frn = f"{output_dir}/predictions_completion_only{'_debug' if debug else ''}.jsonl"
-	completions = load_data(completion_frn)
+	all_completions = load_data(completion_frn)
 
 	output_fwn = f"{output_dir}/predictions{'_debug' if debug else ''}.jsonl"
 
@@ -66,22 +66,23 @@ if __name__ == "__main__":
 	with open(output_fwn, 'w') as fw:
 		writer = jsonlines.Writer(fw, flush=True)
 
-		for i, (example, prediction) in enumerate(dataset, completions):
+		for i, (example, prediction) in enumerate(zip(dataset, all_completions)):
 			if debug and i >= 10:
 				break
 			if i < start_id:
 				continue
 
 			if "completions" in prediction:
-				completion = [prediction["completion"]]
-			elif "completions" in prediction:
 				completions = prediction["completions"]
+			elif "completion" in prediction:
+				completions = [prediction["completion"]]
 			else:
 				raise ValueError(f"Neither 'completion' nor 'completions' found in example {i}.")
 
 			question = example["question"]
 			answer, final_completion = model.derive_answer_from_completions(question, completions)
 			prediction["answer"] = answer
+			prediction["completion"] = final_completion
 			writer.write(prediction)
 
 	print(f"Finished predicting on {i+1} examples. Output written to {output_fwn}.")

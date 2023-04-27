@@ -372,7 +372,7 @@ class Model():
 if __name__ == "__main__":
 	'''Run a simple test.'''
 
-	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][-5]
+	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][-6]
 
 	config_frn = f"source/configuration/config_files/{dataset_name}/codex_noNL.json"
 	config = Config.from_json_file(config_frn)
@@ -382,7 +382,7 @@ if __name__ == "__main__":
 
 	model = Model(config)
 
-	example = {"question": "Do solo pianists require a conductor?"}
+	example = {"question": "Dan had $ 3 left with him after he bought a candy bar. If he had $ 4 at the start, how much did the candy bar cost?"}
 	output = model.predict(example)
 	answer = output["answer"]
 	completion = output["completion"]
