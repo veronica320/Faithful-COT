@@ -164,7 +164,7 @@ class Model():
 		else: # for other datasets, the max token is static for each dataset
 			return CODE_MAX_TOKEN[self.dataset_name]
 
-	@timeout(5)
+	# @timeout(5)
 	def _execute(self, question: str, completion: str):
 		'''Execute the code in the model completion.
 		@:param completion (str): the model completion
@@ -183,7 +183,7 @@ class Model():
 				return answer
 
 			elif self.dataset_name == "AQUA":
-				answer = math_solver.solve_mwp(completion).strip()
+				answer = str(math_solver.solve_mwp(completion)).strip()
 				# AQUA requires the answer to be in the form of a choice
 				# we convert the answer to a choice by querying the LM again
 				with open(f"source/prompt/AQUA/{self.prompt_name}_choice_prompt.txt", "r") as fr:
@@ -191,11 +191,11 @@ class Model():
 				with open(f"source/prompt/AQUA/{self.prompt_name}_choice_template.txt", "r") as fr:
 					choice_template = fr.read()
 				templated_example = self._apply_template(template=choice_template, question=question, answer=answer)
-				prompt_and_example = f"{choice_prompt}\n\n{templated_example}\n"
-				response = self._query(prompt=prompt_and_example,
+				prompt_and_example = f"{choice_prompt}\n\n{templated_example}"
+				completions = self._query(prompt=prompt_and_example,
 										stop=[')', '\n'],
 										LM=self.LM)
-				final_answer = response["choices"][0]["text"]
+				final_answer = completions[0]
 				return final_answer
 
 			elif self.dataset_name == "date":
@@ -372,9 +372,9 @@ class Model():
 if __name__ == "__main__":
 	'''Run a simple test.'''
 
-	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][-2]
+	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][0]
 
-	config_frn = f"source/configuration/config_files/{dataset_name}/codex_NL+SL.json"
+	config_frn = f"source/configuration/config_files/{dataset_name}/codex_noNL.json"
 	config = Config.from_json_file(config_frn)
 	api_keys = list(API_KEYS_CODEX.values())
 	config.api_keys = api_keys
@@ -382,10 +382,7 @@ if __name__ == "__main__":
 
 	model = Model(config)
 
-	example = {
-	           "question": "grab me a coke",
-	           }
-
+	example = {"question": "The original price of an item is discounted 22%. A customer buys the item at this discounted price using a $20-off coupon. There is no tax on the item, and this was the only item the customer bought. If the customer paid $1.90 more than half the original price of the item, what was the original price of the item?\n# Answer option: ['A)$61', 'B)$65', 'C)$67.40', 'D)$70', 'E)$78.20']", "answer": "E", "options": ["A)$61", "B)$65", "C)$67.40", "D)$70", "E)$78.20"], "id": 1}
 	output = model.predict(example)
 	answer = output["answer"]
 	completion = output["completion"]

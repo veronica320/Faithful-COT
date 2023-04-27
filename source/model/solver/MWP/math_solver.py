@@ -20,17 +20,12 @@ def solve_mwp(completion):
 
 	completion = completion.rstrip("#")
 
-	# code = f"{prefix}\n{completion}\nprint(answer)"
 	code = f"{prefix}\n{completion}"
 
 	try:
-		# old_stdout = sys.stdout
-		# redirected_output = sys.stdout = StringIO()
 		locs = {}
 		exec(code, locs, locs)
 		answer = locs["answer"]
-		# answer = redirected_output.getvalue()
-		# sys.stdout = old_stdout
 	except Exception as e:
 		answer = "[invalid]"
 
