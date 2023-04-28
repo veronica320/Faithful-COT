@@ -10,6 +10,7 @@ if cwd.endswith("source/predict"):
 import sys
 sys.path.append("source")
 from configuration.configuration import Config
+from keys import API_KEYS_CODEX
 import argparse
 from model.codex import Model
 from dataset.utils import load_data
@@ -29,10 +30,13 @@ if __name__ == "__main__":
 	split = args.split
 	debug = args.debug
 
+	api_keys = list(API_KEYS_CODEX.values())
+
 	config_frn = f"source/configuration/config_files/{dataset_name}/{model_name}.json"
 	config = Config.from_json_file(config_frn)
 	config.split = split
 	config.dataset_name = dataset_name
+	config.api_keys = api_keys
 
 	# load the dataset
 	dataset_frn = f"data/{dataset_name}/{split}.jsonl"
@@ -63,7 +67,7 @@ if __name__ == "__main__":
 
 	print(f"Staring from the {start_id}th example...")
 
-	with open(output_fwn, 'w') as fw:
+	with open(output_fwn, 'a') as fw:
 		writer = jsonlines.Writer(fw, flush=True)
 
 		for i, (example, prediction) in enumerate(zip(dataset, all_completions)):

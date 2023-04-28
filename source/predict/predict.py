@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
 	print(f"Making predictions on dataset {dataset_name} using model {model_name},\nstarting from the {start_id}th example...")
 
-	with open(output_fwn, 'w') as fw:
+	with open(output_fwn, 'a') as fw:
 		writer = jsonlines.Writer(fw, flush=True)
 		t0 = time.time()
 		for i, example in tqdm(enumerate(dataset), file=sys.stdout):

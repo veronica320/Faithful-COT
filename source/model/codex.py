@@ -164,7 +164,7 @@ class Model():
 		else: # for other datasets, the max token is static for each dataset
 			return CODE_MAX_TOKEN[self.dataset_name]
 
-	@timeout(5)
+	@timeout(200)
 	def _execute(self, question: str, completion: str):
 		'''Execute the code in the model completion.
 		@:param completion (str): the model completion
@@ -372,9 +372,9 @@ class Model():
 if __name__ == "__main__":
 	'''Run a simple test.'''
 
-	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][-6]
+	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][-2]
 
-	config_frn = f"source/configuration/config_files/{dataset_name}/codex_noNL.json"
+	config_frn = f"source/configuration/config_files/{dataset_name}/codex_NL+SL.json"
 	config = Config.from_json_file(config_frn)
 	api_keys = list(API_KEYS_CODEX.values())
 	config.api_keys = api_keys
@@ -382,7 +382,7 @@ if __name__ == "__main__":
 
 	model = Model(config)
 
-	example = {"question": "Dan had $ 3 left with him after he bought a candy bar. If he had $ 4 at the start, how much did the candy bar cost?"}
+	example = {"question": "How would you bring me a 7up can and a tea?"}
 	output = model.predict(example)
 	answer = output["answer"]
 	completion = output["completion"]
