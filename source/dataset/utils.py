@@ -42,8 +42,17 @@ def load_data(frn):
 	:return: The dataset (a list of examples, each as a dictionary).
 	'''
 	if frn.endswith(".jsonl"):
-		with open(frn) as fr:
-			return [json.loads(line) for line in fr.readlines() if line]
+		with open(frn, 'r') as fr:
+			lines = []
+			for i, line in enumerate(fr):
+				if line.strip() == "":
+					continue
+				try:
+					lines.append(json.loads(line))
+				except json.decoder.JSONDecodeError as e:
+					print(f"Error in line {i}: {line}\n {e}")
+					exit(-1)
+		return lines
 	elif frn.endswith(".csv"):
 		with open(frn) as fr:
 			reader = csv.DictReader(fr)
@@ -121,6 +130,9 @@ def extract_pred_answer(dataset_name, pred_completion, rounding="int", abs_val=T
 
 	:return: The predicted answer.
 	'''
+	if INVALID_ANS in str(pred_completion):
+		return INVALID_ANS
+
 	if dataset_name in ["GSM8K", "SVAMP", "MultiArith"]:
 		# GSM8K, SVAMP, and MultiArith all have a single-value integer answer
 		if type(pred_completion) == int:

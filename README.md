@@ -15,7 +15,7 @@ Additionally, to run experiments on **StrategyQA**, you should install [Soufflé
   - `dataset/`: Dataset utility functions.
   - `configuration/`: model configuration. This is to specify the hyperparameters for each model, such as `"prompt_name"`, `"LM"`, and so on. 
     - `configuration.py`: the Config class. See the definition of each field in the `init()` funciton.
-    - `config_files/`: the configuration files for each model. Each file name is in the format of `{model-name}.json`, e.g., `codex_NL+SL.json`. See `configuration/README.md` for details.
+    - `config_files/`: the configuration files for each model. Each file name is in the format of `{model-name}.json`, e.g., `code002_NL+SL.json`. See `configuration/README.md` for details.
   - `prompt/`: The prompts for the LM to generate the reasoning chain. For every prompt with name `{prompt-name}` (e.g., `NL+SL`), there are two files associated with it:
     - `{prompt-name}_prompt.txt`: the prompt containing few-shot examples. See `NL+SL_prompt.txt` for an example.
     - `{prompt-name}_template.txt`: the template to transform a new input example into the desired format. See `NL+SL_template.txt` for an example.
@@ -73,7 +73,7 @@ optional arguments:
 
 Example:
 ```
-nohup python predict.py --model_name codex_NL+SL --dataset_name GSM8K --split test > logs/GSM8K/codex_NL+SL_test.log 2>&1 &
+nohup python predict.py --model_name code002_NL+SL --dataset_name GSM8K --split test > logs/GSM8K/code002_NL+SL_test.log 2>&1 &
 ```
 
 The model predictions will be saved under `output_dir/{dataset_name}/{split}/{model_name}`. See `output_dir/README.md` for details on the format.
@@ -112,13 +112,13 @@ The accuracy will be printed to stdout.
 
 Example:
 ```
-python evaluate_answer_acc.py --model_name codex_NL+SL --dataset_name GSM8K --split test
+python evaluate_answer_acc.py --model_name code002_NL+SL --dataset_name GSM8K --split test
 ```
 Output:
 ```
 Dataset: GSM8K
 Split: test
-Model: codex_NL+SL
+Model: code002_NL+SL
 Answer accuracy: 72.2
 ```
 

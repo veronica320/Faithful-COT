@@ -73,6 +73,8 @@ if __name__ == "__main__":
 		for i, example in tqdm(enumerate(dataset), file=sys.stdout):
 			if debug and i >= 10:
 				break
+			if i < start_id:
+				continue
 			question = example["question"]
 			question_id = int(example["id"])
 			print(question_id)

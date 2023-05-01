@@ -372,9 +372,9 @@ class Model():
 if __name__ == "__main__":
 	'''Run a simple test.'''
 
-	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][-2]
+	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][5]
 
-	config_frn = f"source/configuration/config_files/{dataset_name}/codex_NL+SL.json"
+	config_frn = f"source/configuration/config_files/{dataset_name}/gpt-3.5-turbo.json"
 	config = Config.from_json_file(config_frn)
 	api_keys = list(API_KEYS_CODEX.values())
 	config.api_keys = api_keys
@@ -382,7 +382,7 @@ if __name__ == "__main__":
 
 	model = Model(config)
 
-	example = {"question": "How would you bring me a 7up can and a tea?"}
+	example = {"question": "Could casualties from deadliest war rival France's population?"}
 	output = model.predict(example)
 	answer = output["answer"]
 	completion = output["completion"]

@@ -3,6 +3,9 @@
 /source/keys.py
 /source/predict/*.sh
 /source/predict/logs/
+/source/predict/scripts/
+/source/evaluate/gen_data_for_user_study.py
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -166,3 +169,4 @@ cython_debug/
 #.idea/
 /.idea/
 /.git/
+/source/misc/
