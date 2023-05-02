@@ -1,6 +1,15 @@
 # Faithful-COT
 Code and data accompanying our paper on arXiv ["Faithful Chain-of-Thought Reasoning"](https://arxiv.org/abs/2301.13379).
 
+## Table of Contents
+- [Get started](https://github.com/veronica320/Faithful-COT#get-started)
+- [Repo Structure](https://github.com/veronica320/Faithful-COT#repo-structure)
+- [Usage](https://github.com/veronica320/Faithful-COT#usage)
+  - [Make predictions](https://github.com/veronica320/Faithful-COT#make-predictions)
+  - [Evaluate model predictions](https://github.com/veronica320/Faithful-COT#evaluate-the-model-predictions)
+  - [Get a performance summary table](https://github.com/veronica320/Faithful-COT#get-a-performance-summary-table)
+- [Citation](https://github.com/veronica320/Faithful-COT#citation)
+
 ## Get started
 We suggest using miniconda/conda to set up the environment. The `environment.yml` file specifies the minimal dependencies (note that you need to replace the `prefix` at the end of the file with your desired path of environment.)
 You can create a virtual environment using it according to [this guildeline](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
