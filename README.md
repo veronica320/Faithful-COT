@@ -21,7 +21,7 @@ Code and data accompanying our paper on arXiv ["Faithful Chain-of-Thought Reason
 | **ChatGPT**  |   75.8    |   83.0    |      95.3      |   81.7    |   53.5   | 80.6       |      51.5      | 73.5     | 52.3       | 12.1       |
 | **GPT-4**     | **95.0**  | **95.3**  |      98.5      | **95.6**  |  **73.6**  | **92.2**       |      54.0      | **95.8**     | **99.3**       | **62.7**       |
 
-With **GPT-4**, Faithful CoT achieves <mark>**95.0+** few-shot accuracy</mark> on almost all Math Word Problem datasets, Date Understanding, and Sports Understanding.
+With GPT-4, Faithful CoT achieves❗**95.0+** few-shot accuracy❗on almost all Math Word Problem datasets, Date Understanding, and Sports Understanding.
 
 See [`output_dir/performance_summary.csv`](https://github.com/veronica320/Faithful-COT/blob/861aaa9898dfc8e5da7cc5d1e29bbb437f3c9c0f/output_dir/performance_summary.csv) for detailed results and `output_dir/{dataset_name}` for model predictions.
 
