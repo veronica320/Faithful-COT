@@ -2,13 +2,12 @@
 Code and data accompanying our paper in submission "Faithful Chain-of-Thought Reasoning".
 
 ## Table of Contents
-- [Get started](https://github.com/veronica320/Faithful-COT#get-started)
-- [Repo Structure](https://github.com/veronica320/Faithful-COT#repo-structure)
-- [Usage](https://github.com/veronica320/Faithful-COT#usage)
-  - [Make predictions](https://github.com/veronica320/Faithful-COT#make-predictions)
-  - [Evaluate model predictions](https://github.com/veronica320/Faithful-COT#evaluate-the-model-predictions)
-  - [Get a performance summary table](https://github.com/veronica320/Faithful-COT#get-a-performance-summary-table)
-- [Citation](https://github.com/veronica320/Faithful-COT#citation)
+- Get started
+- Repo Structure
+- Usage
+  - Make predictions
+  - Evaluate model predictions
+  - Get a performance summary table
 
 ## News 📣
 - [Apr 2023] We have added results using **ChatGPT** (`gpt-3.5-turbo`) and **GPT-4** (`gpt-4`) as the underlying Translator LM.
@@ -23,7 +22,7 @@ Code and data accompanying our paper in submission "Faithful Chain-of-Thought Re
 
 With GPT-4, Faithful CoT achieves❗**95.0+** few-shot accuracy❗on almost all Math Word Problem datasets, Date Understanding, and Sports Understanding.
 
-See [`output_dir/performance_summary.csv`](https://github.com/veronica320/Faithful-COT/blob/861aaa9898dfc8e5da7cc5d1e29bbb437f3c9c0f/output_dir/performance_summary.csv) for detailed results and `output_dir/{dataset_name}` for model predictions.
+See `output_dir/performance_summary.csv` for detailed results and `output_dir/{dataset_name}` for model predictions.
 
 
 ## Get started
