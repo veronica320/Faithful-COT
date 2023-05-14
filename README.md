@@ -1,5 +1,5 @@
 # Faithful-COT
-Code and data accompanying our paper on arXiv ["Faithful Chain-of-Thought Reasoning"](https://arxiv.org/abs/2301.13379).
+Code and data accompanying our paper in submission "Faithful Chain-of-Thought Reasoning".
 
 ## Table of Contents
 - [Get started](https://github.com/veronica320/Faithful-COT#get-started)
@@ -157,17 +157,5 @@ python gen_perf_table.py
 ```
 
 The output will be saved to `output_dir/performance_summary.csv`. If there do not exist predictions for a certain model configuration on a dataset, the corresponding cell will be empty.
-
-
-## Citation
-If you find this repository useful, please cite our paper:
-```
-@article{lyu2023faithful,
-  title={Faithful chain-of-thought reasoning},
-  author={Lyu, Qing and Havaldar, Shreya and Stein, Adam and Zhang, Li and Rao, Delip and Wong, Eric and Apidianaki, Marianna and Callison-Burch, Chris},
-  journal={arXiv preprint arXiv:2301.13379},
-  year={2023}
-}
-```
 
 
