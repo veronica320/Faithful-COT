@@ -35,6 +35,44 @@ CODE_MAX_TOKEN = { "GSM8K": 1000,
 				   "CLUTRR": 70 # for each step
                   }
 
+NO_CODE_STOP_TOKEN = {"GSM8K": "Q:",
+                      "SVAMP": "Q:",
+                      "MultiArith": "Q:",
+                      "ASDiv": "Q:",
+                      "AQUA": "Q: ",
+                      "StrategyQA": "Q:",
+                      "date": "Q:",
+                      "sports": "Q:",
+                      "saycan": "Human:",
+                      "CLUTRR": "Context:",
+                      }
+
+NO_CODE_MAX_TOKEN = {"GSM8K": 500,
+                     "SVAMP": 500,
+                     "MultiArith": 500,
+                     "ASDiv": 500,
+                     "AQUA": 500,
+                     "saycan": 300,
+                     "date": 500,
+                     "sports": 500,
+                     "StrategyQA": 500,
+                     "CLUTRR": 70, # for each step
+                     }
+
+# NO_CODE_MAX_TOKEN = {"GSM8K": 1000,
+#                      "SVAMP": 1000,
+#                      "MultiArith": 1000,
+#                      "ASDiv": 1000,
+#                      "AQUA": 1000,
+#                      "saycan": 300,
+#                      "date": 500,
+#                      "sports": 500,
+#                      "StrategyQA": 800,
+#                      "CLUTRR": 70, # for each step
+#                      }
+
+
+
 def load_data(frn):
 	'''Load data from a file.
 	:param frn (str): The dataset file name.
@@ -138,9 +176,16 @@ def extract_pred_answer(dataset_name, pred_completion, rounding="int", abs_val=T
 		if type(pred_completion) == int:
 			pred_answer = pred_completion
 		elif type(pred_completion) == str:
-			try:
-				pred_answer = str2num(pred_completion, rounding, abs_val)
-			except:
+			ANS_RE = re.compile(r"(\-?[0-9\.\,]+)")
+			match = ANS_RE.search(pred_completion)
+			if match:
+				match_str = match.group(1).strip()
+				match_str = match_str.replace(",", "")
+				try:
+					pred_answer = str2num(match_str, rounding, abs_val)
+				except:
+					pred_answer = INVALID_ANS
+			else:
 				pred_answer = INVALID_ANS
 		return pred_answer
 
