@@ -27,8 +27,13 @@ See [`output_dir/performance_summary.csv`](https://github.com/veronica320/Faithf
 
 
 ## Get started
-We suggest using miniconda/conda to set up the environment. The `environment.yml` file specifies the minimal dependencies (note that you need to replace the `prefix` at the end of the file with your desired path of environment.)
-You can create a virtual environment using it according to [this guildeline](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
+We suggest using miniconda/conda to set up the environment. The `environment.yml` file specifies the minimal dependencies. You can create a virtual environment using it according to [this guildeline](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
+
+Essentially, you'll need to do something like:
+```
+cd /path/to/Faithful-COT
+conda env create -f ./environment.yml --prefix ./envs
+```
 
 Additionally, to run experiments on **StrategyQA**, you should install [Soufflé](https://souffle-lang.github.io/index.html) (a version of Datalog interpreter we use) following [these instructions](https://souffle-lang.github.io/build). It's not a Python package, so you'll need to install it separately. Note that under the "Installing Souffle" section you should use `-DCMAKE_INSTALL_PREFIX="~/.local"` for it to be installed to the right place. 
 
