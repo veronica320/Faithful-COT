@@ -29,6 +29,7 @@ class Config(object):
 
 		# API keys; default to empty
 		self.api_keys = []
+		self.org_ids = []
 
 	@classmethod
 	def from_dict(cls, dict_obj):

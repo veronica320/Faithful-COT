@@ -49,31 +49,32 @@ if __name__ == "__main__":
 	df = pd.DataFrame(performance_summary)
 
 	# sort the rows
-	row_names = [
-		"code002_NL+SL",
-		"code002_NL+SL_n:40",
-		"code002_NL+SL_exemplarset1",
-		"code002_NL+SL_exemplarset2",
-		"code002_NL+SL_exemplarset3",
-		"code002_NL+SL_exemplarset4",
-		"code002_NL+SL_exemplarset5",
-		"code002_prompt_variation1",
-		"code002_prompt_variation2",
-		"code002_prompt_variation3",
-		"code002_norationale",
-		"code002_noNLbutnudge",
-		"code002_nosolver",
-		"code002_noNL",
-		"text001_NL+SL",
-		"text002_NL+SL",
-		"text003_NL+SL",
-		"code001_NL+SL",
-		"gpt-3.5-turbo_NL+SL",
-		"gpt4_NL+SL"
+	model_names = ["code001",
+	               "code002",
+	               "text002",
+	               "text003",
+	               "gpt-3.5-turbo",
+	               "gpt4"
+	               
+	               ]
+	prompt_names = [
+		"standard",
+		"COT",
+		"LtM",
+		"noNL",
+		"NL+SL"
 	]
+
+	# for every model, sort the rows by prompt_names
+	row_names = []
+	for model_name in model_names:
+		for prompt_name in prompt_names:
+			row_names.append(f"{model_name}_{prompt_name}")
 	df = df.reindex(row_names)
 
-	column_names = [
+	# sort the columns
+
+	dataset_names = [
 		"GSM8K",
 		"SVAMP",
 		"MultiArith",
@@ -86,6 +87,6 @@ if __name__ == "__main__":
 		"CLUTRR"
 	]
 	# sort the columns
-	df = df[column_names]
+	df = df[dataset_names]
 
 	df.to_csv(f"{output_dir}/performance_summary.csv")

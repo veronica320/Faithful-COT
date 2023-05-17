@@ -32,7 +32,10 @@ def is_correct(dataset_name, gold_answers, pred_answer):
 			step_count = 0
 			steps = re.split(r", |\n", pred_answer.strip())
 			for step in steps:
-				step_action = step.split(". ")[1]
+				step_cols = step.split(". ")
+				if len(step_cols) != 2:
+					return "[invalid]"
+				step_action = step_cols[1]
 				if "find(initial)" in step_action:
 					continue
 				step_count += 1

@@ -5,8 +5,8 @@ if cwd.endswith("source/model"):
 import sys
 sys.path.append("source")
 from configuration.configuration import Config
-from keys import API_KEYS_CODEX
-from dataset.utils import CODE_STOP_TOKEN, CODE_MAX_TOKEN
+from keys import API_KEYS
+from dataset.utils import CODE_STOP_TOKEN, CODE_MAX_TOKEN, NO_CODE_STOP_TOKEN, NO_CODE_MAX_TOKEN
 import sys
 from io import StringIO
 import openai
@@ -19,6 +19,7 @@ import errno
 import os
 import signal
 import functools
+import re
 
 # The following are packages/funtions for exponential backoff
 # (ref. https://platform.openai.com/docs/guides/rate-limits/retrying-with-exponential-backoff)
@@ -87,6 +88,7 @@ class Model():
 
 		# load the API keys
 		self.api_keys = itertools.cycle(config.api_keys)
+		self.org_ids = itertools.cycle(config.org_ids)
 
 	def predict(self, example_dict: dict, completion_only: bool = False):
 		'''Predict the answer to a example.
@@ -101,12 +103,15 @@ class Model():
 		question = example_dict["question"]
 
 		# apply the template to the question
-		templated_example = self._apply_template(template=self.template, question=question)
+		templated_example = self._apply_template(template=self.template, example=example_dict)
 		# concatenate the few-shot prompt and the example
-		prompt_and_example = f"{self.prompt}\n\n{templated_example}\n"
+		prompt_and_example = f"{self.prompt}\n\n{templated_example}"
 
 		# get the stop token for the current dataset
-		stop_token = CODE_STOP_TOKEN[self.dataset_name]
+		if self.no_solver:
+			stop_token = NO_CODE_STOP_TOKEN[self.dataset_name] # use the stop token for no-code prompts
+		else:
+			stop_token = CODE_STOP_TOKEN[self.dataset_name] # use the stop token for with-code prompts
 
 		# get the max token for the current dataset
 		if self.max_tokens: # if max_tokens is specified, use it
@@ -133,7 +138,7 @@ class Model():
 			          }
 			return output
 
-		answer, final_completion = self.derive_answer_from_completions(question=question, completions=completions)
+		answer, final_completion = self.derive_answer_from_completions(example=example_dict, completions=completions)
 
 		output = {"answer": answer,
 				  "completion": final_completion,
@@ -141,15 +146,20 @@ class Model():
 		          }
 		return output
 
-	def _apply_template(self, template: str, question: str, answer: str = ""):
+	def _apply_template(self, template: str, example: dict):
 		'''Apply the template to a new example.
 		@:param template (str): the template to be applied to the example.
-		@:param question (str): the question to be applied to the template.
-		@:param answer (str): the answer to the example.
+		@:param example (str): the example to be converted into the template format.
 
 		@:return (str): the example converted into the template format.
 		'''
-		example_in_template = template.replace("[QUESTION]", question).replace("[ANSWER]", answer)
+		# for every [{FIELD}] in the template, replace it with the corresponding value of the key "{field}" in the example dict
+		example_in_template = template
+		for field in re.findall(r"\[.*?\]", template):
+			field_name = field[1:-1]
+			field_name = field_name.lower()
+			if field_name in example:
+				example_in_template = example_in_template.replace(field, str(example[field_name]))
 		return example_in_template
 
 	def get_max_token(self, dataset_name, example):
@@ -159,25 +169,97 @@ class Model():
 
 		@:return (int): the max token
 		'''
+		if self.no_solver:
+			max_token_dict = NO_CODE_MAX_TOKEN
+		else:
+			max_token_dict = CODE_MAX_TOKEN
+
 		if dataset_name == "CLUTRR": # for CLUTRR, the max token depends on the number of steps required (example["k"])
-			return CODE_MAX_TOKEN[self.dataset_name] * example["k"] # multiply the max token for each step by the number of steps
+			return max_token_dict[self.dataset_name] * example["k"] # multiply the max token for each step by the number of steps
 		else: # for other datasets, the max token is static for each dataset
-			return CODE_MAX_TOKEN[self.dataset_name]
+			return max_token_dict[self.dataset_name]
 
 	@timeout(200)
-	def _execute(self, question: str, completion: str):
+	def _execute(self, example: dict, completion: str):
 		'''Execute the code in the model completion.
+		@:param example (str): the example
 		@:param completion (str): the model completion
-		@:param question (str): the question
 
 		@:return: the answer (the type depends on the dataset)
 		'''
-		if self.no_solver:
-			for line in completion.split("\n"):
-				if line.startswith("Answer: "):
-					return line[8:].strip('"')
+		if self.no_solver: # no solver, use the LM to generate the answer from the completion
+			if self.dataset_name == "AQUA":
+				if "answer is " not in completion:
+					answer = "[invalid]"
+				else:
+					answer = completion.split("answer is ")[-1].strip("\n().").upper()
+			elif self.dataset_name in ["GSM8K", "SVAMP", "MultiArith", "ASDiv"]:
+				if "answer is " not in completion:
+					answer = "[invalid]"
+				else:
+					answer = completion.split("answer is ")[-1].strip("\n.")
+			elif self.dataset_name == "date":
+				if "answer is " not in completion:
+					answer = "[invalid]"
+				else:
+					answer = completion.split("answer is ")[-1].strip()
+					answer = re.sub(pattern="[\s\.#]", repl="", string=answer)
+			elif self.dataset_name == "sports":
+				if "answer is " not in completion:
+					answer = "[invalid]"
+				else:
+					answer = completion.split("answer is ")[-1].split()[0].strip(".")
+					if answer == "yes":
+						answer = "1"
+					elif answer == "no":
+						answer = "0"
+					else:
+						answer = "[invalid]"
+			elif self.dataset_name == "saycan":
+				completion = completion.strip()
+				lines = completion.split("\n")
+				if len(lines) == 1:
+					answer = lines[0].strip()
+				else:
+					answer_line = [line for line in lines if line.startswith("Plan:")][0]
+					answer = answer_line.split("Plan: ")[1].strip()
+			elif self.dataset_name == "CLUTRR":
+				answer = "[invalid]"
+				lines = completion.split("\n")
+				lines = [line.strip() for line in lines if line.strip() != ""]
+				answer_line = lines[-1]
+				# look for patterns like "A is B's xx (relation name)", "A is the xx (relation name) of B"
+				patterns = ["(\[?\w+\]?) is (\[?\w+\]?)'s (\w+)",
+				            "(\[?\w+\]?) is the (\w+) of (\[?\w+\]?)"]
+				relation_position = [3, 2] # where the relation name is in the matched pattern
+				for pattern_id, pattern in enumerate(patterns):
+					matched_pattern = re.search(pattern=pattern, string=answer_line)
+					if matched_pattern is not None:
+						# extract the relation name
+						relation_name = matched_pattern.group(relation_position[pattern_id])
+						answer = relation_name
+						break
+					else:
+						continue
+				answer = answer.strip(".")
+			elif self.dataset_name == "StrategyQA":
+				if "answer is" not in completion:
+					answer = "[invalid]"
+				else:
+					answer = completion.split("answer is ")[-1].split()[0].strip("\n.").lower()
+					if answer == "yes":
+						answer =  True
+					elif answer == "no":
+						answer = False
+					else:
+						answer = "[invalid]"
+			else:
+				for line in completion.split("\n"):
+					if line.startswith("Answer: "):
+						answer = line[8:].strip('"')
+			return answer
 
-		else:
+		else: # use the solver to derive the answer by executing the completion
 			if self.dataset_name in ["GSM8K", "SVAMP", "MultiArith", "ASDiv"]:
 				answer = math_solver.solve_mwp(completion)
 				return answer
@@ -190,7 +272,8 @@ class Model():
 					choice_prompt = fr.read()
 				with open(f"source/prompt/AQUA/{self.prompt_name}_choice_template.txt", "r") as fr:
 					choice_template = fr.read()
-				templated_example = self._apply_template(template=choice_template, question=question, answer=answer)
+				example["answer"] = answer
+				templated_example = self._apply_template(template=choice_template, example=example)
 				prompt_and_example = f"{choice_prompt}\n\n{templated_example}"
 				completions = self._query(prompt=prompt_and_example,
 										stop=[')', '\n'],
@@ -238,8 +321,9 @@ class Model():
 			else:
 				raise NotImplementedError(f"Solver for dataset {self.dataset_name} is not implemented.")
 
-	def derive_answer_from_completions(self, question, completions):
+	def derive_answer_from_completions(self, example, completions):
 		'''Derive the answer from a list of completions.
+		@:param example (dict): the example
 		@:param completions (List[str]): the list of completions
 
 		@:return (tuple): answer (type depends on dataset), final_completion (str)
@@ -249,7 +333,7 @@ class Model():
 		completion_lists = {}  # a dict of lists of completions; each item is {answer: [completions that result in the same answer after execution]}
 		for completion in completions:
 			try:
-				answer = self._execute(question=question, completion=completion)  # execute the completion
+				answer = self._execute(example=example, completion=completion)  # execute the completion
 			except Exception as e:
 				print(f"Error executing completion: {completion}.\n Error: {e}")
 				continue
@@ -293,7 +377,7 @@ class Model():
 			return answer
 
 		elif self.dataset_name == "AQUA":
-			answer = str(answer).strip()
+			answer = str(answer).strip()[0]
 			return answer
 
 		elif self.dataset_name == "date":
@@ -334,6 +418,8 @@ class Model():
 		@:return (dict): the response from the model
 		'''
 		api_key = next(self.api_keys)
+		org_id = next(self.org_ids)
+		openai.organization = org_id
 		openai.api_key = api_key
 
 		if LM in ["code-davinci-001", "code-davinci-002", "text-davinci-001", "text-davinci-002", "text-davinci-003"]: # models that support "completion"
@@ -372,19 +458,21 @@ class Model():
 if __name__ == "__main__":
 	'''Run a simple test.'''
 
-	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][5]
+	dataset_name = ["AQUA", "ASDiv", "GSM8K", "MultiArith", "SVAMP", "StrategyQA", "date", "sports", "saycan", "CLUTRR"][2]
 
-	config_frn = f"source/configuration/config_files/{dataset_name}/gpt-3.5-turbo.json"
+	config_frn = f"source/configuration/config_files/{dataset_name}/code002_COT.json"
 	config = Config.from_json_file(config_frn)
-	api_keys = list(API_KEYS_CODEX.values())
+	api_keys = list(API_KEYS.values())
 	config.api_keys = api_keys
 	config.dataset_name = dataset_name
 
 	model = Model(config)
 
-	example = {"question": "Could casualties from deadliest war rival France's population?"}
+	example = {"question": "Randy has 9 oatmeal cookies, 4 chocolate chip cookies, and 5 sugar cookies. He ate 3 cookies for an early day snack, one of each flavor. He ate 2 oatmeal cookies for lunch. He gives 2 sugar cookies to his friends. Then, he bakes 4 of each flavor for dinner. How many cookies does he have now?",
+	           "answer": "Randy originally has 9+4+5 = <<9+4+5=18>>18 cookies in total.\nHe has 18-3 = <<18-3=15>>15 cookies left.\nHe has 15-2 = <<15-2=13>>13 cookies left.\nHe has 13-2 = <<13-2=11>>11 cookies left.\nRandy bakes 4*3 = <<4*3=12>>12 cookies.\nRandy has 11+12 = <<11+12=23>>23 cookies.\n#### 23", "id": 1301}
+
 	output = model.predict(example)
 	answer = output["answer"]
 	completion = output["completion"]
-	print("Answer:", answer)
+	print("Answer:", [answer])
 	print("Completion:", [completion])

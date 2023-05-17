@@ -66,7 +66,7 @@ Additionally, to run experiments on **StrategyQA**, you should install [Soufflé
 
 1. Provide your OpenAI API key(s) by creating a file called `key.py` under `source/` in the following format:
 ```
-API_KEYS_CODEX = {
+API_KEYS = {
 	"key1_nickname": "key1",
 	"key2_nickname": "key2",
 	...

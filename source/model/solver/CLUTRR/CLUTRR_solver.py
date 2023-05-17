@@ -10,7 +10,7 @@ def solve(completion):
     # get the relation from every step
     relations = []
     for line in completion.split('\n')[1:]:
-        if ' = ' in line and not '@' in line: # it's a code line, not a comment line
+        if ' = ' in line and not '@' in line: # it's a single relation line, not a comment line or the final relation deduction line
             try:
                 relation = line.split(' = ')[1] # get the relation
             except IndexError as e:
@@ -23,12 +23,16 @@ def solve(completion):
         trans_dict = pickle.load(f)
       
      # apply the transitive rules to get the final relation
+    if not relations:
+        return "[invalid]"
+
     final_relation = ""
     for relation in reversed(relations):
         if not final_relation:
+            # first relation
             final_relation = relation
         else:
-            # transitive rules
+            # apply transitive rules
             try:
                 final_relation = trans_dict[(final_relation, relation)]
             except KeyError:

@@ -5,6 +5,7 @@
 /source/predict/logs/
 /source/predict/scripts/
 /source/evaluate/gen_data_for_user_study.py
+/source/user_study
 *.csv
 
 # Byte-compiled / optimized / DLL files
