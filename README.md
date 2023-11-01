@@ -11,8 +11,9 @@ Code and data accompanying our paper ["Faithful Chain-of-Thought Reasoning"](htt
 - [Citation](https://github.com/veronica320/Faithful-COT#citation)
 
 ## News 📣
+- [Nov 2023] 🎉 Our paper won the Area Chair Award (Interpretability and Analysis of Models for NLP) at [IJCNLP-AACL 2023](http://www.ijcnlp-aacl2023.org/)!
 - [Sep 2023] Our paper was accepted to [IJCNLP-AACL 2023](http://www.ijcnlp-aacl2023.org/)!
-- [Jul 2023] Our paper was presented at the [Natural Language Reasoning and Structured Explanations (NLRSE) Workshop](https://nl-reasoning-workshop.github.io/) (non-archival track) at ACL 2023!
+- [Jul 2023] Our paper was presented at the [Natural Language Reasoning and Structured Explanations (NLRSE) Workshop](https://nl-reasoning-workshop.github.io/) (non-archival track) at ACL 2023.
 - [Apr 2023] We have added results using **ChatGPT** (`gpt-3.5-turbo`) and **GPT-4** (`gpt-4`) as the underlying Translator LM.
 
   Here are the accuracy scores in comparison to the original **Codex** (`code-davinci-002`), using the same prompt + greedy decoding:
