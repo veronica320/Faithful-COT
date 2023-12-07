@@ -49,12 +49,13 @@ if __name__ == "__main__":
 	df = pd.DataFrame(performance_summary)
 
 	# sort the rows
-	model_names = ["code001",
+	model_names = [
+				   # "code001",
 	               "code002",
-	               "text002",
-	               "text003",
-	               "gpt-3.5-turbo",
-	               "gpt4"
+	               # "text002",
+	               # "text003",
+	               # "gpt-3.5-turbo",
+	               # "gpt4"
 	               
 	               ]
 	prompt_names = [
@@ -62,8 +63,27 @@ if __name__ == "__main__":
 		"COT",
 		"LtM",
 		"noNL",
-		"NL+SL"
+		"NL+SL",
+		"LtM_n:40",
+		"NL+SL_n:40",
 	]
+
+	# prompt_names = [
+	# 	"NL+SL",
+	# 	"NL+SL_exemplarset1",
+	# 	"NL+SL_exemplarset2",
+	# 	"NL+SL_exemplarset3",
+	# 	"NL+SL_exemplarset4",
+	# 	"NL+SL_exemplarset5",
+	# 	"noNL",
+	# 	"noNLbutnudge",
+	# 	"norationale",
+	# 	"nosolver",
+	# 	"prompt_variation1",
+	# 	"prompt_variation2",
+	# 	"prompt_variation3",
+	# ]
+
 
 	# for every model, sort the rows by prompt_names
 	row_names = []

@@ -171,3 +171,8 @@ cython_debug/
 /.idea/
 /.git/
 /source/misc/
+/source/model/solver/StrategyQA/datalog_files/
+/source/predict/nohup.out
+/source/annotate_copy.html
+/source/model/solver/saycan/test_planner.py
+/source/evaluate/find_example.py
