@@ -36,7 +36,7 @@ def solve(completion):
             try:
                 final_relation = trans_dict[(final_relation, relation)]
             except KeyError:
-                return "unknown"
+                return "[invalid]"
     return final_relation
 
 if __name__ == "__main__":
